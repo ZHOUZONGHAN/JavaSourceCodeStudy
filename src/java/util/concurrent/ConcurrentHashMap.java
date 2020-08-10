@@ -544,6 +544,8 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * than 2, and should be at least 8 to mesh with assumptions in
      * tree removal about conversion back to plain bins upon
      * shrinkage.
+     *
+     * 同一个哈希桶内存储的元素个数超过此阈值时，则存储结构树化
      */
     static final int TREEIFY_THRESHOLD = 8;
 
@@ -551,6 +553,9 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * The bin count threshold for untreeifying a (split) bin during a
      * resize operation. Should be less than TREEIFY_THRESHOLD, and at
      * most 6 to mesh with shrinkage detection under removal.
+     *
+     * 同一个哈希桶内存储元素个数小于等于此阈值时，从红黑树退化为链表
+     * 因为数据少，使用链表更快
      */
     static final int UNTREEIFY_THRESHOLD = 6;
 
@@ -559,6 +564,9 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * (Otherwise the table is resized if too many nodes in a bin.)
      * The value should be at least 4 * TREEIFY_THRESHOLD to avoid
      * conflicts between resizing and treeification thresholds.
+     *
+     * 集合size小于64，无论如何，都不会使用红黑树结构
+     * 转化为红黑树还有一个条件就是 TREEIFY_THRESHOLD
      */
     static final int MIN_TREEIFY_CAPACITY = 64;
 
@@ -615,6 +623,8 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * in bulk tasks.  Subclasses of Node with a negative hash field
      * are special, and contain null keys and values (but are never
      * exported).  Otherwise, keys and vals are never null.
+     *
+     * 存储单个KV数据节点。内部有key、value、hash、next指向下一个节点
      */
     static class Node<K,V> implements Map.Entry<K,V> {
         final int hash;
@@ -769,11 +779,16 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
     /**
      * The array of bins. Lazily initialized upon first insertion.
      * Size is always a power of two. Accessed directly by iterators.
+     *
+     * 默认为null，ConcurrentHashMap存放数据的地方，扩容大小总是2的幂次方
+     * 初始化在第一次插入数据的时候
      */
     transient volatile Node<K,V>[] table;
 
     /**
      * The next table to use; non-null only while resizing.
+     *
+     * 默认为null，扩容时新生成的数组，其大小为原数组的两倍
      */
     private transient volatile Node<K,V>[] nextTable;
 
@@ -791,6 +806,13 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * when table is null, holds the initial table size to use upon
      * creation, or 0 for default. After initialization, holds the
      * next element count value upon which to resize the table.
+     *
+     * ！！！重要属性！！！
+     * 默认为0，用来控制table的初始化和扩容操作
+     * sizeCtl = -1，表示正在初始化
+     * sizeCtl = -n，表示（n - 1）个线程正在进行扩容中
+     * sizeCtl > 0，初始化或扩容中许哟啊使用的容量
+     * sizeCtl = 0，默认值，使用默认容量进行初始化
      */
     private transient volatile int sizeCtl;
 
@@ -2159,6 +2181,8 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
 
     /**
      * A node inserted at head of bins during transfer operations.
+     *
+     * 扩容转发节点，放置此节点后，外部对原有哈希槽的操作会转发到nextTable上
      */
     static final class ForwardingNode<K,V> extends Node<K,V> {
         final Node<K,V>[] nextTable;
@@ -2196,6 +2220,8 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
 
     /**
      * A place-holder node used in computeIfAbsent and compute
+     *
+     * 占位加锁节点。执行某些方法时，对其加锁，如 computeIfAbsent 等。
      */
     static final class ReservationNode<K,V> extends Node<K,V> {
         ReservationNode() {
@@ -2654,6 +2680,8 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
 
     /**
      * Nodes for use in TreeBins
+     *
+     * 在红黑树结构中，实际存储数据的节点
      */
     static final class TreeNode<K,V> extends Node<K,V> {
         TreeNode<K,V> parent;  // red-black tree links
@@ -2714,6 +2742,8 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * their root. They also maintain a parasitic read-write lock
      * forcing writers (who hold bin lock) to wait for readers (who do
      * not) to complete before tree restructuring operations.
+     *
+     * 它并不存储实际的数据，维护对桶内红黑树的读写锁，存储对红黑树节点的引用
      */
     static final class TreeBin<K,V> extends Node<K,V> {
         TreeNode<K,V> root;

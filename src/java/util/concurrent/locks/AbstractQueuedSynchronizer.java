@@ -379,16 +379,24 @@ public abstract class AbstractQueuedSynchronizer
      */
     static final class Node {
         /** Marker to indicate a node is waiting in shared mode */
+        // 共享节点
         static final Node SHARED = new Node();
+
         /** Marker to indicate a node is waiting in exclusive mode */
+        // 独占节点
         static final Node EXCLUSIVE = null;
 
         /** waitStatus value to indicate thread has cancelled */
+        // 已取消状态
         static final int CANCELLED =  1;
+
         /** waitStatus value to indicate successor's thread needs unparking */
+        // 后继节点处于等待状态
         static final int SIGNAL    = -1;
+
         /** waitStatus value to indicate thread is waiting on condition */
         static final int CONDITION = -2;
+
         /**
          * waitStatus value to indicate the next acquireShared should
          * unconditionally propagate
@@ -977,8 +985,7 @@ public abstract class AbstractQueuedSynchronizer
      * Acquires in shared interruptible mode.
      * @param arg the acquire argument
      */
-    private void doAcquireSharedInterruptibly(int arg)
-        throws InterruptedException {
+    private void doAcquireSharedInterruptibly(int arg) throws InterruptedException {
         final Node node = addWaiter(Node.SHARED);
         boolean failed = true;
         try {

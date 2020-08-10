@@ -462,6 +462,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
     // Additionally, if the table array has not been allocated,
     // this field holds the initial array capacity,
     // or zero signifying DEFAULT_INITIAL_CAPACITY.)
+    // 扩容阈值
     int threshold;
 
     /**
@@ -795,6 +796,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
     final void treeifyBin(Node<K, V>[] tab, int hash) {
         int n, index;
         Node<K, V> e;
+        // 如果节点数组小于64，则不会进行树化；只会进行扩容，将所有节点重新hash
         if (tab == null || (n = tab.length) < MIN_TREEIFY_CAPACITY)
             resize();
         else if ((e = tab[index = (n - 1) & hash]) != null) {
