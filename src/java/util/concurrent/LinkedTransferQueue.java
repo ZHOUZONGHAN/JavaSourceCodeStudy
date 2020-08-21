@@ -1064,8 +1064,7 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
          */
         if (pred != null && pred != s && pred.next == s) {
             Node n = s.next;
-            if (n == null ||
-                (n != s && pred.casNext(s, n) && pred.isMatched())) {
+            if (n == null || (n != s && pred.casNext(s, n) && pred.isMatched())) {
                 for (;;) {               // check if at, or could be, head
                     Node h = head;
                     if (h == pred || h == s || h == null)

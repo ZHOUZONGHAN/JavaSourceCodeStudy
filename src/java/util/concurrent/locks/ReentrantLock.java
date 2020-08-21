@@ -755,8 +755,6 @@ public class ReentrantLock implements Lock, java.io.Serializable {
      */
     public String toString() {
         Thread o = sync.getOwner();
-        return super.toString() + ((o == null) ?
-                                   "[Unlocked]" :
-                                   "[Locked by thread " + o.getName() + "]");
+        return super.toString() + ((o == null) ? "[Unlocked]" : "[Locked by thread " + o.getName() + "]");
     }
 }

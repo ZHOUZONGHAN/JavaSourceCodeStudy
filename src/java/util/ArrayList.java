@@ -207,12 +207,14 @@ public class ArrayList<E> extends AbstractList<E>
      *
      * @param   minCapacity   the desired minimum capacity
      */
+    // 使用该方法可以将数组一次性的扩容到指定大小，在预知数组大小的时候可以使用
+    // 如果参数大于低层数组长度的1.5倍，那么这个数组的容量就会被扩容到这个参数值，
+    // 如果参数小于低层数组长度的1.5倍，那么这个容量就会被扩容到低层数组长度的1.5倍
     public void ensureCapacity(int minCapacity) {
         int minExpand = (elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA)
             // any size if not default element table
             ? 0
-            // larger than default for default empty table. It's already
-            // supposed to be at default size.
+            // larger than default for default empty table. It's already supposed to be at default size.
             : DEFAULT_CAPACITY;
 
         if (minCapacity > minExpand) {
@@ -220,6 +222,7 @@ public class ArrayList<E> extends AbstractList<E>
         }
     }
 
+    // 该方法实现初始化最小容量为10
     private static int calculateCapacity(Object[] elementData, int minCapacity) {
         if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
             return Math.max(DEFAULT_CAPACITY, minCapacity);
@@ -257,6 +260,8 @@ public class ArrayList<E> extends AbstractList<E>
      *
      * @param minCapacity the desired minimum capacity
      */
+    // ArrayList的扩容方法  默认扩容1.5倍
+    // 最后通过copyOf方法进行数组迁移
     private void grow(int minCapacity) {
         // overflow-conscious code
         int oldCapacity = elementData.length;

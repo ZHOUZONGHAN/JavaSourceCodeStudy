@@ -1035,26 +1035,27 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
         int binCount = 0;
         for (Node<K,V>[] tab = table;;) {
             Node<K,V> f; int n, i, fh;
+            // 如果table为空,执行初始化操作
             if (tab == null || (n = tab.length) == 0)
                 tab = initTable();
+            // table[i]为空,用CAS在table[i]头结点直接插入,退出插入操作;如果CAS失败,则有其他节点已经插入,继续下一步
             else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
-                if (casTabAt(tab, i, null,
-                             new Node<K,V>(hash, key, value, null)))
+                if (casTabAt(tab, i, null, new Node<K,V>(hash, key, value, null)))
                     break;                   // no lock when adding to empty bin
             }
+            // 如果table[i]不为空,且table[i]的hash值为-1,则有其他线程在执行扩容操作,帮助他们一起扩容,提高性能
             else if ((fh = f.hash) == MOVED)
                 tab = helpTransfer(tab, f);
             else {
                 V oldVal = null;
                 synchronized (f) {
                     if (tabAt(tab, i) == f) {
+                        // fh(table[i])的hash>=0,则此时table[i]为链表结构,找到合适位置插入
                         if (fh >= 0) {
                             binCount = 1;
                             for (Node<K,V> e = f;; ++binCount) {
                                 K ek;
-                                if (e.hash == hash &&
-                                    ((ek = e.key) == key ||
-                                     (ek != null && key.equals(ek)))) {
+                                if (e.hash == hash && ((ek = e.key) == key || (ek != null && key.equals(ek)))) {
                                     oldVal = e.val;
                                     if (!onlyIfAbsent)
                                         e.val = value;
@@ -1062,17 +1063,16 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                 }
                                 Node<K,V> pred = e;
                                 if ((e = e.next) == null) {
-                                    pred.next = new Node<K,V>(hash, key,
-                                                              value, null);
+                                    pred.next = new Node<K,V>(hash, key, value, null);
                                     break;
                                 }
                             }
                         }
+                        // fh(table[i])的hash<0,table[i]为红黑树结构,这个过程采用同步内置锁实现并发
                         else if (f instanceof TreeBin) {
                             Node<K,V> p;
                             binCount = 2;
-                            if ((p = ((TreeBin<K,V>)f).putTreeVal(hash, key,
-                                                           value)) != null) {
+                            if ((p = ((TreeBin<K,V>)f).putTreeVal(hash, key, value)) != null) {
                                 oldVal = p.val;
                                 if (!onlyIfAbsent)
                                     p.val = value;
@@ -1080,6 +1080,7 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
                         }
                     }
                 }
+                // 检查链表长度是否超过阈值,若是,则转变为红黑树结构
                 if (binCount != 0) {
                     if (binCount >= TREEIFY_THRESHOLD)
                         treeifyBin(tab, i);
