@@ -199,14 +199,15 @@ public class ReentrantLock implements Lock, java.io.Serializable {
         private static final long serialVersionUID = 7316153563782823691L;
 
         /**
-         * Performs lock.  Try immediate barge, backing up to normal
-         * acquire on failure.
+         * Performs lock.  Try immediate barge, backing up to normal acquire on failure.
          */
         final void lock() {
-            if (compareAndSetState(0, 1))
+            // 直接通过CAS获取锁，如果抢到锁了就直接执行，没抢到就去排队
+            if (compareAndSetState(0, 1)) {
                 setExclusiveOwnerThread(Thread.currentThread());
-            else
+            } else {
                 acquire(1);
+            }
         }
 
         protected final boolean tryAcquire(int acquires) {
@@ -221,6 +222,7 @@ public class ReentrantLock implements Lock, java.io.Serializable {
         private static final long serialVersionUID = -3000897897090466540L;
 
         final void lock() {
+            // 直接去CLH队列排队取锁
             acquire(1);
         }
 
@@ -232,16 +234,17 @@ public class ReentrantLock implements Lock, java.io.Serializable {
             final Thread current = Thread.currentThread();
             int c = getState();
             if (c == 0) {
-                if (!hasQueuedPredecessors() &&
-                    compareAndSetState(0, acquires)) {
+                // 判断CLH队列中是否有启发排队请求，并且对state的赋值操作可以执行
+                if (!hasQueuedPredecessors() && compareAndSetState(0, acquires)) {
+                    // 把当前线程设置为专有持有者
                     setExclusiveOwnerThread(current);
                     return true;
                 }
-            }
-            else if (current == getExclusiveOwnerThread()) {
+            } else if (current == getExclusiveOwnerThread()) {// 该线程本就是专有持有者
                 int nextc = c + acquires;
                 if (nextc < 0)
                     throw new Error("Maximum lock count exceeded");
+                // 因为已经是线程的持有者所以可以直接赋值，不需要通过CAS的方式
                 setState(nextc);
                 return true;
             }
@@ -253,6 +256,7 @@ public class ReentrantLock implements Lock, java.io.Serializable {
      * Creates an instance of {@code ReentrantLock}.
      * This is equivalent to using {@code ReentrantLock(false)}.
      */
+    // ReentrantLock默认是非公平锁
     public ReentrantLock() {
         sync = new NonfairSync();
     }
@@ -263,6 +267,7 @@ public class ReentrantLock implements Lock, java.io.Serializable {
      *
      * @param fair {@code true} if this lock should use a fair ordering policy
      */
+    // 构造函数传递true时，创建公平锁
     public ReentrantLock(boolean fair) {
         sync = fair ? new FairSync() : new NonfairSync();
     }

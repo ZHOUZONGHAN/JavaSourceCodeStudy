@@ -382,6 +382,7 @@ public abstract class AbstractQueuedSynchronizer
         // 共享节点
         static final Node SHARED = new Node();
 
+        // 以下是节点的各种状态常量
         /** Marker to indicate a node is waiting in exclusive mode */
         // 独占节点
         static final Node EXCLUSIVE = null;
@@ -538,6 +539,7 @@ public abstract class AbstractQueuedSynchronizer
     /**
      * The synchronization state.
      */
+    // 类似于操作系统中的信号量，每加一次锁就需要 state+1
     private volatile int state;
 
     /**
@@ -874,8 +876,7 @@ public abstract class AbstractQueuedSynchronizer
                     failed = false;
                     return interrupted;
                 }
-                if (shouldParkAfterFailedAcquire(p, node) &&
-                    parkAndCheckInterrupt())
+                if (shouldParkAfterFailedAcquire(p, node) && parkAndCheckInterrupt())
                     interrupted = true;
             }
         } finally {
@@ -1202,8 +1203,8 @@ public abstract class AbstractQueuedSynchronizer
      *        can represent anything you like.
      */
     public final void acquire(int arg) {
-        if (!tryAcquire(arg) &&
-            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        // 获取不到锁并且不能添加进等待队列，则中断线程
+        if (!tryAcquire(arg) && acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
             selfInterrupt();
     }
 
@@ -1523,8 +1524,7 @@ public abstract class AbstractQueuedSynchronizer
         Node t = tail; // Read fields in reverse initialization order
         Node h = head;
         Node s;
-        return h != t &&
-            ((s = h.next) == null || s.thread != Thread.currentThread());
+        return h != t && ((s = h.next) == null || s.thread != Thread.currentThread());
     }
 
 
