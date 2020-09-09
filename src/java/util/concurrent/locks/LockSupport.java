@@ -122,6 +122,10 @@ public class LockSupport {
 
     private static void setBlocker(Thread t, Object arg) {
         // Even though volatile, hotspot doesn't need a write barrier here.
+        // 第一个参数是操作对象
+        // 第二个参数是内存偏移量
+        // 第三个参数是实际存储值
+        // 操作某个对象中某个内存地址下的数据
         UNSAFE.putObject(t, parkBlockerOffset, arg);
     }
 
@@ -136,6 +140,7 @@ public class LockSupport {
      * @param thread the thread to unpark, or {@code null}, in which case
      *        this operation has no effect
      */
+    // 唤醒一个被阻塞的线程
     public static void unpark(Thread thread) {
         if (thread != null)
             UNSAFE.unpark(thread);
@@ -169,10 +174,15 @@ public class LockSupport {
      *        thread parking
      * @since 1.6
      */
+    // 阻塞当前线程
+    // blocker 是用来标识当前线程等待的对象
     public static void park(Object blocker) {
         Thread t = Thread.currentThread();
+        // 记录当前线程等待的对象(阻塞对象)
         setBlocker(t, blocker);
+        // 阻塞当前线程
         UNSAFE.park(false, 0L);
+        // 当前线程等待对象置为null
         setBlocker(t, null);
     }
 
@@ -208,6 +218,7 @@ public class LockSupport {
      * @param nanos the maximum number of nanoseconds to wait
      * @since 1.6
      */
+    // 阻塞当前线程，最多阻塞 nanos 纳秒
     public static void parkNanos(Object blocker, long nanos) {
         if (nanos > 0) {
             Thread t = Thread.currentThread();
@@ -250,6 +261,7 @@ public class LockSupport {
      *        to wait until
      * @since 1.6
      */
+    // 阻塞当前线程，直到 deadline 最后期限
     public static void parkUntil(Object blocker, long deadline) {
         Thread t = Thread.currentThread();
         setBlocker(t, blocker);
@@ -269,6 +281,7 @@ public class LockSupport {
      * @throws NullPointerException if argument is null
      * @since 1.6
      */
+    // 获取到阻塞的对象
     public static Object getBlocker(Thread t) {
         if (t == null)
             throw new NullPointerException();
@@ -392,6 +405,7 @@ public class LockSupport {
 
     // Hotspot implementation via intrinsics API
     private static final sun.misc.Unsafe UNSAFE;
+    // 偏移量
     private static final long parkBlockerOffset;
     private static final long SEED;
     private static final long PROBE;
@@ -400,7 +414,10 @@ public class LockSupport {
         try {
             UNSAFE = sun.misc.Unsafe.getUnsafe();
             Class<?> tk = Thread.class;
+            // objectFieldOffset()方法用于获取某个字段相对Java对象的“起始地址”的偏移量
+            // 某字段在其类中的内存偏移量总是相同的
             parkBlockerOffset = UNSAFE.objectFieldOffset
+                // 获取线程中的parkBlocker字段
                 (tk.getDeclaredField("parkBlocker"));
             SEED = UNSAFE.objectFieldOffset
                 (tk.getDeclaredField("threadLocalRandomSeed"));

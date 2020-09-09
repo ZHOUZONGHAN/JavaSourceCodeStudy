@@ -1,10 +1,23 @@
 package test.java.test;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author zhouzh6
  * @date 2020-08-06
  */
 public class Main {
+    public static  <T>T[] test(List<T> list) {
+        if(list.size()==0){
+            return (T[])new Object[0];
+        }
+        Class<?> aClass = list.get(0).getClass();
+        return list.toArray((T[])Array.newInstance(aClass,0));
+    }
+
     public static void main(String[] args) {
         Main main = new Main();
 //        int x = 66;
@@ -19,6 +32,10 @@ public class Main {
         p.age = 20;
         main.testPerson(p);
         System.out.println(p.getAge());
+        ArrayList<String> list = new ArrayList<>();
+        list.add("1");
+        // FIXME
+        String[] test = test(list);
 
     }
 

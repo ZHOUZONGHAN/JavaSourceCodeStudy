@@ -183,8 +183,11 @@ public abstract class Buffer {
 
     // Invariants: mark <= position <= limit <= capacity
     private int mark = -1;
+    // 下一个要被都或者写的元素的索引
     private int position = 0;
+    // 表示buffer有数据区域的最大位置
     private int limit;
+    // 可以容纳的最大数据量，在缓冲区创建是设定且不能被改变
     private int capacity;
 
     // Used only by direct buffers

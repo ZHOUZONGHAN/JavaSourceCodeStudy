@@ -1,40 +1,11 @@
 /*
  * Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.
  * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 
 // -- This file was mechanically generated: Do not edit! -- //
 
 package java.nio;
-
-
-
-
-
-
-
-
-
 
 /**
  * A byte buffer.
@@ -57,7 +28,6 @@ package java.nio;
  *   byte array or some other byte
  *   buffer into this buffer; </p></li>
  *
-
  *
  *   <li><p> Absolute and relative {@link #getChar() <i>get</i>}
  *   and {@link #putChar(char) <i>put</i>} methods that read and
@@ -68,7 +38,6 @@ package java.nio;
  *   which allow a byte buffer to be viewed as a buffer containing values of
  *   some other primitive type; and </p></li>
  *
-
  *
  *   <li><p> Methods for {@link #compact compacting}, {@link
  *   #duplicate duplicating}, and {@link #slice slicing}
@@ -78,21 +47,11 @@ package java.nio;
  *
  * <p> Byte buffers can be created either by {@link #allocate
  * <i>allocation</i>}, which allocates space for the buffer's
- *
-
- *
+ * <p>
+ * <p>
  * content, or by {@link #wrap(byte[]) <i>wrapping</i>} an
  * existing byte array  into a buffer.
  *
-
-
-
-
-
-
-
- *
-
  *
  * <a name="direct"></a>
  * <h2> Direct <i>vs.</i> non-direct buffers </h2>
@@ -149,7 +108,7 @@ package java.nio;
  * float  {@link #getFloat()}
  * float  {@link #getFloat(int) getFloat(int index)}
  *  void  {@link #putFloat(float) putFloat(float f)}
- *  void  {@link #putFloat(int,float) putFloat(int index, float f)}</pre></blockquote>
+ *  void  {@link #putFloat(int, float) putFloat(int index, float f)}</pre></blockquote>
  *
  * <p> Corresponding methods are defined for the types <tt>char</tt>,
  * <tt>short</tt>, <tt>int</tt>, <tt>long</tt>, and <tt>double</tt>.  The index
@@ -190,79 +149,32 @@ package java.nio;
  * <p> The byte order of a view buffer is fixed to be that of its byte buffer
  * at the time that the view is created.  </p>
  *
-
-*
-
-
-
-
-
-
-
-
-
-
-
-*
-
-
-
-
-
-
-
-
  *
-
  * <h2> Invocation chaining </h2>
-
  *
  * <p> Methods in this class that do not otherwise have a value to return are
  * specified to return the buffer upon which they are invoked.  This allows
  * method invocations to be chained.
- *
-
- *
+ * <p>
+ * <p>
  * The sequence of statements
  *
  * <blockquote><pre>
  * bb.putInt(0xCAFEBABE);
  * bb.putShort(3);
  * bb.putShort(45);</pre></blockquote>
- *
+ * <p>
  * can, for example, be replaced by the single statement
  *
  * <blockquote><pre>
  * bb.putInt(0xCAFEBABE).putShort(3).putShort(45);</pre></blockquote>
- *
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- *
  *
  * @author Mark Reinhold
  * @author JSR-51 Expert Group
  * @since 1.4
  */
 
-public abstract class ByteBuffer
-    extends Buffer
-    implements Comparable<ByteBuffer>
-{
+public abstract class ByteBuffer extends Buffer implements Comparable<ByteBuffer> {
 
     // These fields are declared here rather than in Heap-X-Buffer in order to
     // reduce the number of virtual method invocations needed to access these
@@ -276,8 +188,7 @@ public abstract class ByteBuffer
     // backing array, and array offset
     //
     ByteBuffer(int mark, int pos, int lim, int cap,   // package-private
-                 byte[] hb, int offset)
-    {
+               byte[] hb, int offset) {
         super(mark, pos, lim, cap);
         this.hb = hb;
         this.offset = offset;
@@ -290,7 +201,6 @@ public abstract class ByteBuffer
     }
 
 
-
     /**
      * Allocates a new direct byte buffer.
      *
@@ -299,18 +209,13 @@ public abstract class ByteBuffer
      * initialized to zero.  Whether or not it has a
      * {@link #hasArray backing array} is unspecified.
      *
-     * @param  capacity
-     *         The new buffer's capacity, in bytes
-     *
-     * @return  The new byte buffer
-     *
-     * @throws  IllegalArgumentException
-     *          If the <tt>capacity</tt> is a negative integer
+     * @param capacity The new buffer's capacity, in bytes
+     * @return The new byte buffer
+     * @throws IllegalArgumentException If the <tt>capacity</tt> is a negative integer
      */
     public static ByteBuffer allocateDirect(int capacity) {
         return new DirectByteBuffer(capacity);
     }
-
 
 
     /**
@@ -321,13 +226,9 @@ public abstract class ByteBuffer
      * initialized to zero.  It will have a {@link #array backing array},
      * and its {@link #arrayOffset array offset} will be zero.
      *
-     * @param  capacity
-     *         The new buffer's capacity, in bytes
-     *
-     * @return  The new byte buffer
-     *
-     * @throws  IllegalArgumentException
-     *          If the <tt>capacity</tt> is a negative integer
+     * @param capacity The new buffer's capacity, in bytes
+     * @return The new byte buffer
+     * @throws IllegalArgumentException If the <tt>capacity</tt> is a negative integer
      */
     public static ByteBuffer allocate(int capacity) {
         if (capacity < 0)
@@ -346,29 +247,19 @@ public abstract class ByteBuffer
      * {@link #array backing array} will be the given array, and
      * its {@link #arrayOffset array offset} will be zero.  </p>
      *
-     * @param  array
-     *         The array that will back the new buffer
-     *
-     * @param  offset
-     *         The offset of the subarray to be used; must be non-negative and
-     *         no larger than <tt>array.length</tt>.  The new buffer's position
-     *         will be set to this value.
-     *
-     * @param  length
-     *         The length of the subarray to be used;
-     *         must be non-negative and no larger than
-     *         <tt>array.length - offset</tt>.
-     *         The new buffer's limit will be set to <tt>offset + length</tt>.
-     *
-     * @return  The new byte buffer
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If the preconditions on the <tt>offset</tt> and <tt>length</tt>
-     *          parameters do not hold
+     * @param array  The array that will back the new buffer
+     * @param offset The offset of the subarray to be used; must be non-negative and
+     *               no larger than <tt>array.length</tt>.  The new buffer's position
+     *               will be set to this value.
+     * @param length The length of the subarray to be used;
+     *               must be non-negative and no larger than
+     *               <tt>array.length - offset</tt>.
+     *               The new buffer's limit will be set to <tt>offset + length</tt>.
+     * @return The new byte buffer
+     * @throws IndexOutOfBoundsException If the preconditions on the <tt>offset</tt> and <tt>length</tt>
+     *                                   parameters do not hold
      */
-    public static ByteBuffer wrap(byte[] array,
-                                    int offset, int length)
-    {
+    public static ByteBuffer wrap(byte[] array, int offset, int length) {
         try {
             return new HeapByteBuffer(array, offset, length);
         } catch (IllegalArgumentException x) {
@@ -387,106 +278,12 @@ public abstract class ByteBuffer
      * given array, and its {@link #arrayOffset array offset>} will
      * be zero.  </p>
      *
-     * @param  array
-     *         The array that will back this buffer
-     *
-     * @return  The new byte buffer
+     * @param array The array that will back this buffer
+     * @return The new byte buffer
      */
     public static ByteBuffer wrap(byte[] array) {
         return wrap(array, 0, array.length);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**
@@ -504,7 +301,7 @@ public abstract class ByteBuffer
      * buffer is direct, and it will be read-only if, and only if, this buffer
      * is read-only.  </p>
      *
-     * @return  The new byte buffer
+     * @return The new byte buffer
      */
     public abstract ByteBuffer slice();
 
@@ -521,7 +318,7 @@ public abstract class ByteBuffer
      * and only if, this buffer is direct, and it will be read-only if, and
      * only if, this buffer is read-only.  </p>
      *
-     * @return  The new byte buffer
+     * @return The new byte buffer
      */
     public abstract ByteBuffer duplicate();
 
@@ -541,7 +338,7 @@ public abstract class ByteBuffer
      * <p> If this buffer is itself read-only then this method behaves in
      * exactly the same way as the {@link #duplicate duplicate} method.  </p>
      *
-     * @return  The new, read-only byte buffer
+     * @return The new, read-only byte buffer
      */
     public abstract ByteBuffer asReadOnlyBuffer();
 
@@ -552,10 +349,8 @@ public abstract class ByteBuffer
      * Relative <i>get</i> method.  Reads the byte at this buffer's
      * current position, and then increments the position.
      *
-     * @return  The byte at the buffer's current position
-     *
-     * @throws  BufferUnderflowException
-     *          If the buffer's current position is not smaller than its limit
+     * @return The byte at the buffer's current position
+     * @throws BufferUnderflowException If the buffer's current position is not smaller than its limit
      */
     public abstract byte get();
 
@@ -565,16 +360,10 @@ public abstract class ByteBuffer
      * <p> Writes the given byte into this buffer at the current
      * position, and then increments the position. </p>
      *
-     * @param  b
-     *         The byte to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferOverflowException
-     *          If this buffer's current position is not smaller than its limit
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param b The byte to be written
+     * @return This buffer
+     * @throws BufferOverflowException If this buffer's current position is not smaller than its limit
+     * @throws ReadOnlyBufferException If this buffer is read-only
      */
     public abstract ByteBuffer put(byte b);
 
@@ -582,28 +371,12 @@ public abstract class ByteBuffer
      * Absolute <i>get</i> method.  Reads the byte at the given
      * index.
      *
-     * @param  index
-     *         The index from which the byte will be read
-     *
-     * @return  The byte at the given index
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit
+     * @param index The index from which the byte will be read
+     * @return The byte at the given index
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit
      */
     public abstract byte get(int index);
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**
@@ -612,20 +385,12 @@ public abstract class ByteBuffer
      * <p> Writes the given byte into this buffer at the given
      * index. </p>
      *
-     * @param  index
-     *         The index at which the byte will be written
-     *
-     * @param  b
-     *         The byte value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param index The index at which the byte will be written
+     * @param b     The byte value to be written
+     * @return This buffer
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit
+     * @throws ReadOnlyBufferException   If this buffer is read-only
      */
     public abstract ByteBuffer put(int index, byte b);
 
@@ -655,32 +420,22 @@ public abstract class ByteBuffer
      *     for (int i = off; i < off + len; i++)
      *         dst[i] = src.get():
      * }</pre>
-     *
+     * <p>
      * except that it first checks that there are sufficient bytes in
      * this buffer and it is potentially much more efficient.
      *
-     * @param  dst
-     *         The array into which bytes are to be written
-     *
-     * @param  offset
-     *         The offset within the array of the first byte to be
-     *         written; must be non-negative and no larger than
-     *         <tt>dst.length</tt>
-     *
-     * @param  length
-     *         The maximum number of bytes to be written to the given
-     *         array; must be non-negative and no larger than
-     *         <tt>dst.length - offset</tt>
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferUnderflowException
-     *          If there are fewer than <tt>length</tt> bytes
-     *          remaining in this buffer
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If the preconditions on the <tt>offset</tt> and <tt>length</tt>
-     *          parameters do not hold
+     * @param dst    The array into which bytes are to be written
+     * @param offset The offset within the array of the first byte to be
+     *               written; must be non-negative and no larger than
+     *               <tt>dst.length</tt>
+     * @param length The maximum number of bytes to be written to the given
+     *               array; must be non-negative and no larger than
+     *               <tt>dst.length - offset</tt>
+     * @return This buffer
+     * @throws BufferUnderflowException  If there are fewer than <tt>length</tt> bytes
+     *                                   remaining in this buffer
+     * @throws IndexOutOfBoundsException If the preconditions on the <tt>offset</tt> and <tt>length</tt>
+     *                                   parameters do not hold
      */
     public ByteBuffer get(byte[] dst, int offset, int length) {
         checkBounds(offset, length, dst.length);
@@ -702,14 +457,10 @@ public abstract class ByteBuffer
      * <pre>
      *     src.get(a, 0, a.length) </pre>
      *
-     * @param   dst
-     *          The destination array
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferUnderflowException
-     *          If there are fewer than <tt>length</tt> bytes
-     *          remaining in this buffer
+     * @param dst The destination array
+     * @return This buffer
+     * @throws BufferUnderflowException If there are fewer than <tt>length</tt> bytes
+     *                                  remaining in this buffer
      */
     public ByteBuffer get(byte[] dst) {
         return get(dst, 0, dst.length);
@@ -739,25 +490,17 @@ public abstract class ByteBuffer
      * <pre>
      *     while (src.hasRemaining())
      *         dst.put(src.get()); </pre>
-     *
+     * <p>
      * except that it first checks that there is sufficient space in this
      * buffer and it is potentially much more efficient.
      *
-     * @param  src
-     *         The source buffer from which bytes are to be read;
-     *         must not be this buffer
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferOverflowException
-     *          If there is insufficient space in this buffer
-     *          for the remaining bytes in the source buffer
-     *
-     * @throws  IllegalArgumentException
-     *          If the source buffer is this buffer
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param src The source buffer from which bytes are to be read;
+     *            must not be this buffer
+     * @return This buffer
+     * @throws BufferOverflowException  If there is insufficient space in this buffer
+     *                                  for the remaining bytes in the source buffer
+     * @throws IllegalArgumentException If the source buffer is this buffer
+     * @throws ReadOnlyBufferException  If this buffer is read-only
      */
     public ByteBuffer put(ByteBuffer src) {
         if (src == this)
@@ -795,33 +538,21 @@ public abstract class ByteBuffer
      *     for (int i = off; i < off + len; i++)
      *         dst.put(a[i]);
      * }</pre>
-     *
+     * <p>
      * except that it first checks that there is sufficient space in this
      * buffer and it is potentially much more efficient.
      *
-     * @param  src
-     *         The array from which bytes are to be read
-     *
-     * @param  offset
-     *         The offset within the array of the first byte to be read;
-     *         must be non-negative and no larger than <tt>array.length</tt>
-     *
-     * @param  length
-     *         The number of bytes to be read from the given array;
-     *         must be non-negative and no larger than
-     *         <tt>array.length - offset</tt>
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferOverflowException
-     *          If there is insufficient space in this buffer
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If the preconditions on the <tt>offset</tt> and <tt>length</tt>
-     *          parameters do not hold
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param src    The array from which bytes are to be read
+     * @param offset The offset within the array of the first byte to be read;
+     *               must be non-negative and no larger than <tt>array.length</tt>
+     * @param length The number of bytes to be read from the given array;
+     *               must be non-negative and no larger than
+     *               <tt>array.length - offset</tt>
+     * @return This buffer
+     * @throws BufferOverflowException   If there is insufficient space in this buffer
+     * @throws IndexOutOfBoundsException If the preconditions on the <tt>offset</tt> and <tt>length</tt>
+     *                                   parameters do not hold
+     * @throws ReadOnlyBufferException   If this buffer is read-only
      */
     public ByteBuffer put(byte[] src, int offset, int length) {
         checkBounds(offset, length, src.length);
@@ -844,113 +575,14 @@ public abstract class ByteBuffer
      * <pre>
      *     dst.put(a, 0, a.length) </pre>
      *
-     * @param   src
-     *          The source array
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferOverflowException
-     *          If there is insufficient space in this buffer
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param src The source array
+     * @return This buffer
+     * @throws BufferOverflowException If there is insufficient space in this buffer
+     * @throws ReadOnlyBufferException If this buffer is read-only
      */
     public final ByteBuffer put(byte[] src) {
         return put(src, 0, src.length);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // -- Other stuff --
@@ -963,8 +595,8 @@ public abstract class ByteBuffer
      * and {@link #arrayOffset() arrayOffset} methods may safely be invoked.
      * </p>
      *
-     * @return  <tt>true</tt> if, and only if, this buffer
-     *          is backed by an array and is not read-only
+     * @return <tt>true</tt> if, and only if, this buffer
+     * is backed by an array and is not read-only
      */
     public final boolean hasArray() {
         return (hb != null) && !isReadOnly;
@@ -981,13 +613,9 @@ public abstract class ByteBuffer
      * method in order to ensure that this buffer has an accessible backing
      * array.  </p>
      *
-     * @return  The array that backs this buffer
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is backed by an array but is read-only
-     *
-     * @throws  UnsupportedOperationException
-     *          If this buffer is not backed by an accessible array
+     * @return The array that backs this buffer
+     * @throws ReadOnlyBufferException       If this buffer is backed by an array but is read-only
+     * @throws UnsupportedOperationException If this buffer is not backed by an accessible array
      */
     public final byte[] array() {
         if (hb == null)
@@ -1008,14 +636,10 @@ public abstract class ByteBuffer
      * method in order to ensure that this buffer has an accessible backing
      * array.  </p>
      *
-     * @return  The offset within this buffer's array
-     *          of the first element of the buffer
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is backed by an array but is read-only
-     *
-     * @throws  UnsupportedOperationException
-     *          If this buffer is not backed by an accessible array
+     * @return The offset within this buffer's array
+     * of the first element of the buffer
+     * @throws ReadOnlyBufferException       If this buffer is backed by an array but is read-only
+     * @throws UnsupportedOperationException If this buffer is not backed by an accessible array
      */
     public final int arrayOffset() {
         if (hb == null)
@@ -1043,7 +667,7 @@ public abstract class ByteBuffer
      * followed immediately by an invocation of another relative <i>put</i>
      * method. </p>
      *
-
+     *
      *
      * <p> Invoke this method after writing data from a buffer in case the
      * write was incomplete.  The following loop, for example, copies bytes
@@ -1058,28 +682,23 @@ public abstract class ByteBuffer
      *   }
      * }</pre></blockquote>
      *
-
-     *
-     * @return  This buffer
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @return This buffer
+     * @throws ReadOnlyBufferException If this buffer is read-only
      */
     public abstract ByteBuffer compact();
 
     /**
      * Tells whether or not this byte buffer is direct.
      *
-     * @return  <tt>true</tt> if, and only if, this buffer is direct
+     * @return <tt>true</tt> if, and only if, this buffer is direct
      */
     public abstract boolean isDirect();
-
 
 
     /**
      * Returns a string summarizing the state of this buffer.
      *
-     * @return  A summary string
+     * @return A summary string
      */
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -1095,10 +714,6 @@ public abstract class ByteBuffer
     }
 
 
-
-
-
-
     /**
      * Returns the current hash code of this buffer.
      *
@@ -1110,17 +725,13 @@ public abstract class ByteBuffer
      * to use buffers as keys in hash maps or similar data structures unless it
      * is known that their contents will not change.  </p>
      *
-     * @return  The current hash code of this buffer
+     * @return The current hash code of this buffer
      */
     public int hashCode() {
         int h = 1;
         int p = position();
         for (int i = limit() - 1; i >= p; i--)
-
-
-
-            h = 31 * h + (int)get(i);
-
+            h = 31 * h + (int) get(i);
         return h;
     }
 
@@ -1138,30 +749,29 @@ public abstract class ByteBuffer
      *
      *   <li><p> The two sequences of remaining elements, considered
      *   independently of their starting positions, are pointwise equal.
-
-
-
-
-
-
-
+     *
+     *
+     *
+     *
+     *
+     *
+     *
      *   </p></li>
      *
      * </ol>
      *
      * <p> A byte buffer is not equal to any other type of object.  </p>
      *
-     * @param  ob  The object to which this buffer is to be compared
-     *
-     * @return  <tt>true</tt> if, and only if, this buffer is equal to the
-     *           given object
+     * @param ob The object to which this buffer is to be compared
+     * @return <tt>true</tt> if, and only if, this buffer is equal to the
+     * given object
      */
     public boolean equals(Object ob) {
         if (this == ob)
             return true;
         if (!(ob instanceof ByteBuffer))
             return false;
-        ByteBuffer that = (ByteBuffer)ob;
+        ByteBuffer that = (ByteBuffer) ob;
         if (this.remaining() != that.remaining())
             return false;
         int p = this.position();
@@ -1172,11 +782,7 @@ public abstract class ByteBuffer
     }
 
     private static boolean equals(byte x, byte y) {
-
-
-
         return x == y;
-
     }
 
     /**
@@ -1185,22 +791,22 @@ public abstract class ByteBuffer
      * <p> Two byte buffers are compared by comparing their sequences of
      * remaining elements lexicographically, without regard to the starting
      * position of each sequence within its corresponding buffer.
-
-
-
-
-
-
-
-
+     * <p>
+     * <p>
+     * <p>
+     * <p>
+     * <p>
+     * <p>
+     * <p>
+     * <p>
      * Pairs of {@code byte} elements are compared as if by invoking
-     * {@link Byte#compare(byte,byte)}.
-
+     * {@link Byte#compare(byte, byte)}.
+     *
      *
      * <p> A byte buffer is not comparable to any other type of object.
      *
-     * @return  A negative integer, zero, or a positive integer as this buffer
-     *          is less than, equal to, or greater than the given buffer
+     * @return A negative integer, zero, or a positive integer as this buffer
+     * is less than, equal to, or greater than the given buffer
      */
     public int compareTo(ByteBuffer that) {
         int n = this.position() + Math.min(this.remaining(), that.remaining());
@@ -1213,237 +819,19 @@ public abstract class ByteBuffer
     }
 
     private static int compare(byte x, byte y) {
-
-
-
-
-
-
         return Byte.compare(x, y);
-
     }
 
     // -- Other char stuff --
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // -- Other byte stuff: Access to binary data --
 
+    // package-private
+    boolean bigEndian = true;
+    // package-private
+    boolean nativeByteOrder = (Bits.byteOrder() == ByteOrder.BIG_ENDIAN);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    boolean bigEndian                                   // package-private
-        = true;
-    boolean nativeByteOrder                             // package-private
-        = (Bits.byteOrder() == ByteOrder.BIG_ENDIAN);
 
     /**
      * Retrieves this buffer's byte order.
@@ -1453,7 +841,7 @@ public abstract class ByteBuffer
      * a newly-created byte buffer is always {@link ByteOrder#BIG_ENDIAN
      * BIG_ENDIAN}.  </p>
      *
-     * @return  This buffer's byte order
+     * @return This buffer's byte order
      */
     public final ByteOrder order() {
         return bigEndian ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
@@ -1462,23 +850,22 @@ public abstract class ByteBuffer
     /**
      * Modifies this buffer's byte order.
      *
-     * @param  bo
-     *         The new byte order,
-     *         either {@link ByteOrder#BIG_ENDIAN BIG_ENDIAN}
-     *         or {@link ByteOrder#LITTLE_ENDIAN LITTLE_ENDIAN}
-     *
-     * @return  This buffer
+     * @param bo The new byte order,
+     *           either {@link ByteOrder#BIG_ENDIAN BIG_ENDIAN}
+     *           or {@link ByteOrder#LITTLE_ENDIAN LITTLE_ENDIAN}
+     * @return This buffer
      */
     public final ByteBuffer order(ByteOrder bo) {
         bigEndian = (bo == ByteOrder.BIG_ENDIAN);
         nativeByteOrder =
-            (bigEndian == (Bits.byteOrder() == ByteOrder.BIG_ENDIAN));
+                (bigEndian == (Bits.byteOrder() == ByteOrder.BIG_ENDIAN));
         return this;
     }
 
     // Unchecked accessors, for use by ByteBufferAs-X-Buffer classes
     //
     abstract byte _get(int i);                          // package-private
+
     abstract void _put(int i, byte b);                  // package-private
 
 
@@ -1489,11 +876,9 @@ public abstract class ByteBuffer
      * composing them into a char value according to the current byte order,
      * and then increments the position by two.  </p>
      *
-     * @return  The char value at the buffer's current position
-     *
-     * @throws  BufferUnderflowException
-     *          If there are fewer than two bytes
-     *          remaining in this buffer
+     * @return The char value at the buffer's current position
+     * @throws BufferUnderflowException If there are fewer than two bytes
+     *                                  remaining in this buffer
      */
     public abstract char getChar();
 
@@ -1505,17 +890,11 @@ public abstract class ByteBuffer
      * current byte order, into this buffer at the current position, and then
      * increments the position by two.  </p>
      *
-     * @param  value
-     *         The char value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferOverflowException
-     *          If there are fewer than two bytes
-     *          remaining in this buffer
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param value The char value to be written
+     * @return This buffer
+     * @throws BufferOverflowException If there are fewer than two bytes
+     *                                 remaining in this buffer
+     * @throws ReadOnlyBufferException If this buffer is read-only
      */
     public abstract ByteBuffer putChar(char value);
 
@@ -1525,15 +904,11 @@ public abstract class ByteBuffer
      * <p> Reads two bytes at the given index, composing them into a
      * char value according to the current byte order.  </p>
      *
-     * @param  index
-     *         The index from which the bytes will be read
-     *
-     * @return  The char value at the given index
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus one
+     * @param index The index from which the bytes will be read
+     * @return The char value at the given index
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus one
      */
     public abstract char getChar(int index);
 
@@ -1544,21 +919,13 @@ public abstract class ByteBuffer
      * <p> Writes two bytes containing the given char value, in the
      * current byte order, into this buffer at the given index.  </p>
      *
-     * @param  index
-     *         The index at which the bytes will be written
-     *
-     * @param  value
-     *         The char value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus one
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param index The index at which the bytes will be written
+     * @param value The char value to be written
+     * @return This buffer
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus one
+     * @throws ReadOnlyBufferException   If this buffer is read-only
      */
     public abstract ByteBuffer putChar(int index, char value);
 
@@ -1576,7 +943,7 @@ public abstract class ByteBuffer
      * if, and only if, this buffer is direct, and it will be read-only if, and
      * only if, this buffer is read-only.  </p>
      *
-     * @return  A new char buffer
+     * @return A new char buffer
      */
     public abstract CharBuffer asCharBuffer();
 
@@ -1588,11 +955,9 @@ public abstract class ByteBuffer
      * composing them into a short value according to the current byte order,
      * and then increments the position by two.  </p>
      *
-     * @return  The short value at the buffer's current position
-     *
-     * @throws  BufferUnderflowException
-     *          If there are fewer than two bytes
-     *          remaining in this buffer
+     * @return The short value at the buffer's current position
+     * @throws BufferUnderflowException If there are fewer than two bytes
+     *                                  remaining in this buffer
      */
     public abstract short getShort();
 
@@ -1604,17 +969,11 @@ public abstract class ByteBuffer
      * current byte order, into this buffer at the current position, and then
      * increments the position by two.  </p>
      *
-     * @param  value
-     *         The short value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferOverflowException
-     *          If there are fewer than two bytes
-     *          remaining in this buffer
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param value The short value to be written
+     * @return This buffer
+     * @throws BufferOverflowException If there are fewer than two bytes
+     *                                 remaining in this buffer
+     * @throws ReadOnlyBufferException If this buffer is read-only
      */
     public abstract ByteBuffer putShort(short value);
 
@@ -1624,15 +983,11 @@ public abstract class ByteBuffer
      * <p> Reads two bytes at the given index, composing them into a
      * short value according to the current byte order.  </p>
      *
-     * @param  index
-     *         The index from which the bytes will be read
-     *
-     * @return  The short value at the given index
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus one
+     * @param index The index from which the bytes will be read
+     * @return The short value at the given index
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus one
      */
     public abstract short getShort(int index);
 
@@ -1643,21 +998,13 @@ public abstract class ByteBuffer
      * <p> Writes two bytes containing the given short value, in the
      * current byte order, into this buffer at the given index.  </p>
      *
-     * @param  index
-     *         The index at which the bytes will be written
-     *
-     * @param  value
-     *         The short value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus one
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param index The index at which the bytes will be written
+     * @param value The short value to be written
+     * @return This buffer
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus one
+     * @throws ReadOnlyBufferException   If this buffer is read-only
      */
     public abstract ByteBuffer putShort(int index, short value);
 
@@ -1675,7 +1022,7 @@ public abstract class ByteBuffer
      * if, and only if, this buffer is direct, and it will be read-only if, and
      * only if, this buffer is read-only.  </p>
      *
-     * @return  A new short buffer
+     * @return A new short buffer
      */
     public abstract ShortBuffer asShortBuffer();
 
@@ -1687,11 +1034,9 @@ public abstract class ByteBuffer
      * composing them into an int value according to the current byte order,
      * and then increments the position by four.  </p>
      *
-     * @return  The int value at the buffer's current position
-     *
-     * @throws  BufferUnderflowException
-     *          If there are fewer than four bytes
-     *          remaining in this buffer
+     * @return The int value at the buffer's current position
+     * @throws BufferUnderflowException If there are fewer than four bytes
+     *                                  remaining in this buffer
      */
     public abstract int getInt();
 
@@ -1703,17 +1048,11 @@ public abstract class ByteBuffer
      * current byte order, into this buffer at the current position, and then
      * increments the position by four.  </p>
      *
-     * @param  value
-     *         The int value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferOverflowException
-     *          If there are fewer than four bytes
-     *          remaining in this buffer
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param value The int value to be written
+     * @return This buffer
+     * @throws BufferOverflowException If there are fewer than four bytes
+     *                                 remaining in this buffer
+     * @throws ReadOnlyBufferException If this buffer is read-only
      */
     public abstract ByteBuffer putInt(int value);
 
@@ -1723,15 +1062,11 @@ public abstract class ByteBuffer
      * <p> Reads four bytes at the given index, composing them into a
      * int value according to the current byte order.  </p>
      *
-     * @param  index
-     *         The index from which the bytes will be read
-     *
-     * @return  The int value at the given index
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus three
+     * @param index The index from which the bytes will be read
+     * @return The int value at the given index
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus three
      */
     public abstract int getInt(int index);
 
@@ -1742,21 +1077,13 @@ public abstract class ByteBuffer
      * <p> Writes four bytes containing the given int value, in the
      * current byte order, into this buffer at the given index.  </p>
      *
-     * @param  index
-     *         The index at which the bytes will be written
-     *
-     * @param  value
-     *         The int value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus three
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param index The index at which the bytes will be written
+     * @param value The int value to be written
+     * @return This buffer
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus three
+     * @throws ReadOnlyBufferException   If this buffer is read-only
      */
     public abstract ByteBuffer putInt(int index, int value);
 
@@ -1774,7 +1101,7 @@ public abstract class ByteBuffer
      * if, and only if, this buffer is direct, and it will be read-only if, and
      * only if, this buffer is read-only.  </p>
      *
-     * @return  A new int buffer
+     * @return A new int buffer
      */
     public abstract IntBuffer asIntBuffer();
 
@@ -1786,11 +1113,9 @@ public abstract class ByteBuffer
      * composing them into a long value according to the current byte order,
      * and then increments the position by eight.  </p>
      *
-     * @return  The long value at the buffer's current position
-     *
-     * @throws  BufferUnderflowException
-     *          If there are fewer than eight bytes
-     *          remaining in this buffer
+     * @return The long value at the buffer's current position
+     * @throws BufferUnderflowException If there are fewer than eight bytes
+     *                                  remaining in this buffer
      */
     public abstract long getLong();
 
@@ -1802,17 +1127,11 @@ public abstract class ByteBuffer
      * current byte order, into this buffer at the current position, and then
      * increments the position by eight.  </p>
      *
-     * @param  value
-     *         The long value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferOverflowException
-     *          If there are fewer than eight bytes
-     *          remaining in this buffer
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param value The long value to be written
+     * @return This buffer
+     * @throws BufferOverflowException If there are fewer than eight bytes
+     *                                 remaining in this buffer
+     * @throws ReadOnlyBufferException If this buffer is read-only
      */
     public abstract ByteBuffer putLong(long value);
 
@@ -1822,15 +1141,11 @@ public abstract class ByteBuffer
      * <p> Reads eight bytes at the given index, composing them into a
      * long value according to the current byte order.  </p>
      *
-     * @param  index
-     *         The index from which the bytes will be read
-     *
-     * @return  The long value at the given index
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus seven
+     * @param index The index from which the bytes will be read
+     * @return The long value at the given index
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus seven
      */
     public abstract long getLong(int index);
 
@@ -1841,21 +1156,13 @@ public abstract class ByteBuffer
      * <p> Writes eight bytes containing the given long value, in the
      * current byte order, into this buffer at the given index.  </p>
      *
-     * @param  index
-     *         The index at which the bytes will be written
-     *
-     * @param  value
-     *         The long value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus seven
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param index The index at which the bytes will be written
+     * @param value The long value to be written
+     * @return This buffer
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus seven
+     * @throws ReadOnlyBufferException   If this buffer is read-only
      */
     public abstract ByteBuffer putLong(int index, long value);
 
@@ -1873,7 +1180,7 @@ public abstract class ByteBuffer
      * if, and only if, this buffer is direct, and it will be read-only if, and
      * only if, this buffer is read-only.  </p>
      *
-     * @return  A new long buffer
+     * @return A new long buffer
      */
     public abstract LongBuffer asLongBuffer();
 
@@ -1885,11 +1192,9 @@ public abstract class ByteBuffer
      * composing them into a float value according to the current byte order,
      * and then increments the position by four.  </p>
      *
-     * @return  The float value at the buffer's current position
-     *
-     * @throws  BufferUnderflowException
-     *          If there are fewer than four bytes
-     *          remaining in this buffer
+     * @return The float value at the buffer's current position
+     * @throws BufferUnderflowException If there are fewer than four bytes
+     *                                  remaining in this buffer
      */
     public abstract float getFloat();
 
@@ -1901,17 +1206,11 @@ public abstract class ByteBuffer
      * current byte order, into this buffer at the current position, and then
      * increments the position by four.  </p>
      *
-     * @param  value
-     *         The float value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferOverflowException
-     *          If there are fewer than four bytes
-     *          remaining in this buffer
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param value The float value to be written
+     * @return This buffer
+     * @throws BufferOverflowException If there are fewer than four bytes
+     *                                 remaining in this buffer
+     * @throws ReadOnlyBufferException If this buffer is read-only
      */
     public abstract ByteBuffer putFloat(float value);
 
@@ -1921,15 +1220,11 @@ public abstract class ByteBuffer
      * <p> Reads four bytes at the given index, composing them into a
      * float value according to the current byte order.  </p>
      *
-     * @param  index
-     *         The index from which the bytes will be read
-     *
-     * @return  The float value at the given index
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus three
+     * @param index The index from which the bytes will be read
+     * @return The float value at the given index
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus three
      */
     public abstract float getFloat(int index);
 
@@ -1940,21 +1235,13 @@ public abstract class ByteBuffer
      * <p> Writes four bytes containing the given float value, in the
      * current byte order, into this buffer at the given index.  </p>
      *
-     * @param  index
-     *         The index at which the bytes will be written
-     *
-     * @param  value
-     *         The float value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus three
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param index The index at which the bytes will be written
+     * @param value The float value to be written
+     * @return This buffer
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus three
+     * @throws ReadOnlyBufferException   If this buffer is read-only
      */
     public abstract ByteBuffer putFloat(int index, float value);
 
@@ -1972,7 +1259,7 @@ public abstract class ByteBuffer
      * if, and only if, this buffer is direct, and it will be read-only if, and
      * only if, this buffer is read-only.  </p>
      *
-     * @return  A new float buffer
+     * @return A new float buffer
      */
     public abstract FloatBuffer asFloatBuffer();
 
@@ -1984,11 +1271,9 @@ public abstract class ByteBuffer
      * composing them into a double value according to the current byte order,
      * and then increments the position by eight.  </p>
      *
-     * @return  The double value at the buffer's current position
-     *
-     * @throws  BufferUnderflowException
-     *          If there are fewer than eight bytes
-     *          remaining in this buffer
+     * @return The double value at the buffer's current position
+     * @throws BufferUnderflowException If there are fewer than eight bytes
+     *                                  remaining in this buffer
      */
     public abstract double getDouble();
 
@@ -2000,17 +1285,11 @@ public abstract class ByteBuffer
      * current byte order, into this buffer at the current position, and then
      * increments the position by eight.  </p>
      *
-     * @param  value
-     *         The double value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  BufferOverflowException
-     *          If there are fewer than eight bytes
-     *          remaining in this buffer
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param value The double value to be written
+     * @return This buffer
+     * @throws BufferOverflowException If there are fewer than eight bytes
+     *                                 remaining in this buffer
+     * @throws ReadOnlyBufferException If this buffer is read-only
      */
     public abstract ByteBuffer putDouble(double value);
 
@@ -2020,15 +1299,11 @@ public abstract class ByteBuffer
      * <p> Reads eight bytes at the given index, composing them into a
      * double value according to the current byte order.  </p>
      *
-     * @param  index
-     *         The index from which the bytes will be read
-     *
-     * @return  The double value at the given index
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus seven
+     * @param index The index from which the bytes will be read
+     * @return The double value at the given index
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus seven
      */
     public abstract double getDouble(int index);
 
@@ -2039,21 +1314,13 @@ public abstract class ByteBuffer
      * <p> Writes eight bytes containing the given double value, in the
      * current byte order, into this buffer at the given index.  </p>
      *
-     * @param  index
-     *         The index at which the bytes will be written
-     *
-     * @param  value
-     *         The double value to be written
-     *
-     * @return  This buffer
-     *
-     * @throws  IndexOutOfBoundsException
-     *          If <tt>index</tt> is negative
-     *          or not smaller than the buffer's limit,
-     *          minus seven
-     *
-     * @throws  ReadOnlyBufferException
-     *          If this buffer is read-only
+     * @param index The index at which the bytes will be written
+     * @param value The double value to be written
+     * @return This buffer
+     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative
+     *                                   or not smaller than the buffer's limit,
+     *                                   minus seven
+     * @throws ReadOnlyBufferException   If this buffer is read-only
      */
     public abstract ByteBuffer putDouble(int index, double value);
 
@@ -2071,7 +1338,7 @@ public abstract class ByteBuffer
      * if, and only if, this buffer is direct, and it will be read-only if, and
      * only if, this buffer is read-only.  </p>
      *
-     * @return  A new double buffer
+     * @return A new double buffer
      */
     public abstract DoubleBuffer asDoubleBuffer();
 
