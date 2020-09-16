@@ -329,7 +329,8 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
      * @throws NullPointerException {@inheritDoc}
      */
     public void put(E e) throws InterruptedException {
-        if (e == null) throw new NullPointerException();
+        if (e == null)
+            throw new NullPointerException();
         // Note: convention in all put/take/etc is to preset local var
         // holding count negative to indicate failure unless set.
         int c = -1;
@@ -408,7 +409,8 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
      * @throws NullPointerException if the specified element is null
      */
     public boolean offer(E e) {
-        if (e == null) throw new NullPointerException();
+        if (e == null)
+            throw new NullPointerException();
         final AtomicInteger count = this.count;
         if (count.get() == capacity)
             return false;

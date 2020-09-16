@@ -1,6 +1,7 @@
 package test.java.test;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,46 +11,23 @@ import java.util.List;
  * @date 2020-08-06
  */
 public class Main {
-    public static  <T>T[] test(List<T> list) {
-        if(list.size()==0){
-            return (T[])new Object[0];
+    public static <T> T[] test(List<T> list) {
+        if (list.size() == 0) {
+            return (T[]) new Object[0];
         }
         Class<?> aClass = list.get(0).getClass();
-        return list.toArray((T[])Array.newInstance(aClass,0));
+        return list.toArray((T[]) Array.newInstance(aClass, 0));
     }
 
-    public static void main(String[] args) {
-        Main main = new Main();
-//        int x = 66;
-//        main.testX(x);
-//        System.out.println(x);
+    public static void main(String[] args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        ArrayList<Integer> list = new ArrayList<Integer>();
 
-//        String s = "66";
-//        main.testString(s);
-//        System.out.println(s);
+        list.add(1);  //这样调用 add 方法只能存储整形，因为泛型类型的实例为 Integer
 
-        Person p = new Person();
-        p.age = 20;
-        main.testPerson(p);
-        System.out.println(p.getAge());
-        ArrayList<String> list = new ArrayList<>();
-        list.add("1");
-        // FIXME
-        String[] test = test(list);
+        list.getClass().getMethod("add", Object.class).invoke(list, "asd");
 
-    }
-
-    public void testX(int x) {
-        x = 666;
-        System.out.println(x);
-    }
-
-    public void testString(String s) {
-        s = "666";
-    }
-
-    public void testPerson(Person p) {
-//        p = new Person();
-        p.age = 18;
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i));
+        }
     }
 }

@@ -112,11 +112,13 @@ public class ArrayList<E> extends AbstractList<E>
     /**
      * Default initial capacity.
      */
+    // ArrayList默认大小
     private static final int DEFAULT_CAPACITY = 10;
 
     /**
      * Shared empty array instance used for empty instances.
      */
+    // ArrayList初始化为空
     private static final Object[] EMPTY_ELEMENTDATA = {};
 
     /**
@@ -247,11 +249,10 @@ public class ArrayList<E> extends AbstractList<E>
      * Some VMs reserve some header words in an array.
      * Attempts to allocate larger arrays may result in
      * OutOfMemoryError: Requested array size exceeds VM limit
-     *
-     * Java中数组不是类，所以没有对应的class文件，数组类型是由jvm从元素类型合成出来的。
-     * 在JVM中获取数组长度是用arraylength这个专门的字节码指令，在数组的对象头中有一个_length字段，记录数组的长度，只需要读取_length即可获取数组长
-     * ArrayList中定义的最大长度为 Integer.MAX_VALUE - 8，这个8是用来用来存放数组对象的对象头的，因为对象头的信息占用内存不可以超过8字节
      */
+    // Java中数组不是类，所以没有对应的class文件，数组类型是由jvm从元素类型合成出来的。
+    // 在JVM中获取数组长度是用arraylength这个专门的字节码指令，在数组的对象头中有一个_length字段，记录数组的长度，只需要读取_length即可获取数组长
+    // ArrayList中定义的最大长度为 Integer.MAX_VALUE - 8，这个8是用来用来存放数组对象的对象头的，因为对象头的信息占用内存不可以超过8字节
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
     /**

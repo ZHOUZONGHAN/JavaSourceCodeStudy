@@ -85,10 +85,9 @@ public class Executors {
      * @return the newly created thread pool
      * @throws IllegalArgumentException if {@code nThreads <= 0}
      */
+    // 固定线程数的线程池
     public static ExecutorService newFixedThreadPool(int nThreads) {
-        return new ThreadPoolExecutor(nThreads, nThreads,
-                                      0L, TimeUnit.MILLISECONDS,
-                                      new LinkedBlockingQueue<Runnable>());
+        return new ThreadPoolExecutor(nThreads, nThreads,0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
     }
 
     /**
@@ -106,11 +105,9 @@ public class Executors {
      * @throws IllegalArgumentException if {@code parallelism <= 0}
      * @since 1.8
      */
+    // 创建持有足够线程的线程池支持给定的并行度，并通过使用多个队列减少竞争
     public static ExecutorService newWorkStealingPool(int parallelism) {
-        return new ForkJoinPool
-            (parallelism,
-             ForkJoinPool.defaultForkJoinWorkerThreadFactory,
-             null, true);
+        return new ForkJoinPool(parallelism, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true);
     }
 
     /**
@@ -122,10 +119,8 @@ public class Executors {
      * @since 1.8
      */
     public static ExecutorService newWorkStealingPool() {
-        return new ForkJoinPool
-            (Runtime.getRuntime().availableProcessors(),
-             ForkJoinPool.defaultForkJoinWorkerThreadFactory,
-             null, true);
+        // 把CPU数量设置为默认并行度
+        return new ForkJoinPool(Runtime.getRuntime().availableProcessors(), ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true);
     }
 
     /**
@@ -167,11 +162,9 @@ public class Executors {
      *
      * @return the newly created single-threaded Executor
      */
+    // 创建一个单线程的线程池，相当于单线程串行执行所有任务，保证按任务的提交顺序依次执行
     public static ExecutorService newSingleThreadExecutor() {
-        return new FinalizableDelegatedExecutorService
-            (new ThreadPoolExecutor(1, 1,
-                                    0L, TimeUnit.MILLISECONDS,
-                                    new LinkedBlockingQueue<Runnable>()));
+        return new FinalizableDelegatedExecutorService(new ThreadPoolExecutor(1, 1,0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>()));
     }
 
     /**
@@ -189,11 +182,7 @@ public class Executors {
      * @throws NullPointerException if threadFactory is null
      */
     public static ExecutorService newSingleThreadExecutor(ThreadFactory threadFactory) {
-        return new FinalizableDelegatedExecutorService
-            (new ThreadPoolExecutor(1, 1,
-                                    0L, TimeUnit.MILLISECONDS,
-                                    new LinkedBlockingQueue<Runnable>(),
-                                    threadFactory));
+        return new FinalizableDelegatedExecutorService(new ThreadPoolExecutor(1, 1,0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory));
     }
 
     /**
@@ -212,10 +201,9 @@ public class Executors {
      *
      * @return the newly created thread pool
      */
+    // 创建一个高度可伸缩的线程池，最大可达到Integer.MAX_VALU(2147483647)，当线程处于空闲则回收，任务增加则新建线程
     public static ExecutorService newCachedThreadPool() {
-        return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
-                                      60L, TimeUnit.SECONDS,
-                                      new SynchronousQueue<Runnable>());
+        return new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
     }
 
     /**
@@ -228,10 +216,7 @@ public class Executors {
      * @throws NullPointerException if threadFactory is null
      */
     public static ExecutorService newCachedThreadPool(ThreadFactory threadFactory) {
-        return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
-                                      60L, TimeUnit.SECONDS,
-                                      new SynchronousQueue<Runnable>(),
-                                      threadFactory);
+        return new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), threadFactory);
     }
 
     /**
@@ -248,8 +233,7 @@ public class Executors {
      * @return the newly created scheduled executor
      */
     public static ScheduledExecutorService newSingleThreadScheduledExecutor() {
-        return new DelegatedScheduledExecutorService
-            (new ScheduledThreadPoolExecutor(1));
+        return new DelegatedScheduledExecutorService(new ScheduledThreadPoolExecutor(1));
     }
 
     /**
@@ -281,6 +265,7 @@ public class Executors {
      * @return a newly created scheduled thread pool
      * @throws IllegalArgumentException if {@code corePoolSize < 0}
      */
+    // 线程池最大数为Integer.MAX_VALU(2147483647)，支持定时及周期性任务执行,
     public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) {
         return new ScheduledThreadPoolExecutor(corePoolSize);
     }
@@ -296,8 +281,7 @@ public class Executors {
      * @throws IllegalArgumentException if {@code corePoolSize < 0}
      * @throws NullPointerException if threadFactory is null
      */
-    public static ScheduledExecutorService newScheduledThreadPool(
-            int corePoolSize, ThreadFactory threadFactory) {
+    public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize, ThreadFactory threadFactory) {
         return new ScheduledThreadPoolExecutor(corePoolSize, threadFactory);
     }
 
