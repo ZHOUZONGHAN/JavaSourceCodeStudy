@@ -1,6 +1,6 @@
 package test.java.lang;
 
-public class TestString {
+public class StringTest {
 
     public static void main(String[] args) {
 

@@ -378,6 +378,14 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * that workerCount is 0 (which sometimes entails a recheck -- see
      * below).
      */
+
+    /** 对线程池的运行状态和线程池中有效线程的数量进行控制的一个字段，
+     *  它同时包含两部分的信息：
+     *     1.线程池的运行状态 (runState)
+     *     2.线程池内有效线程的数量 (workerCount)
+     *  高3位保存runState，低29位保存workerCount，两个变量之间互不干扰。
+     */
+    // 用一个变量去存储两个值，可避免在做相关决策时，出现不一致的情况，不必为了维护两者的一致，而占用锁资源
     private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
 
     // Integer共有32位，最右边29位表示工作线程数，最左边3位表示线程池状态
@@ -939,8 +947,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     /**
      * 根据当前线程池状态，检查是否可以添加新的任务线程，如果可以则创建并启动任务
      * 如果一切顺利则返回true。返回false的可能性如下：
-     * ①线程池没有处于RUNNING状态
-     * ②线程工厂创建新的任务线程失败
+     *      1.线程池没有处于RUNNING状态
+     *      2.线程工厂创建新的任务线程失败
      * @param firstTask 外部启动线程池时需要构建的第一个线程，它是线程的母体
      * @param core 新增工作线程时的判断指标，解释如下
      *             true：表示新增工作线程时，需要判断当RUNNING状态的线程是否少于corePoolSize
@@ -1350,7 +1358,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      */
     public ThreadPoolExecutor(
             // 常驻核心线程数
-            // 如果是0，则任务执行完之后，没有任何请求进入时，销毁线程池的线程；如果大于0，当任务执行完之后越不会销毁线程
+            // 如果是0，则任务执行完之后，没有任何请求进入时，销毁线程池的线程；
+            // 如果大于0，当任务执行完之后越不会销毁线程
             // 如果这个值过大会造成资源浪费，过小会导致线程频繁的创建和销毁
             int corePoolSize,
             // 线程池能够容纳同时执行的最大线程数
@@ -1433,6 +1442,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         }
         if (isRunning(c) && workQueue.offer(command)) {
             int recheck = ctl.get();
+            // 检测线程池运行状态，如果不是RUNNING，则直接拒绝，线程池要保证在RUNNING的状态下执行任务
             if (!isRunning(recheck) && remove(command))
                 reject(command);
             else if (workerCountOf(recheck) == 0)

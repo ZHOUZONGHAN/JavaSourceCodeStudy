@@ -60,6 +60,7 @@ public class Object {
      *         class of this object.
      * @jls 15.8.2 Class Literals
      */
+    // 用于返回当前运行时对象的Class对象，使用了final关键字修饰，故不允许子类重写。
     public final native Class<?> getClass();
 
     /**
@@ -97,6 +98,7 @@ public class Object {
      * @see     java.lang.Object#equals(java.lang.Object)
      * @see     java.lang.System#identityHashCode
      */
+    // 用于返回对象的哈希码，主要使用在哈希表中，比如JDK中的HashMap
     public native int hashCode();
 
     /**
@@ -145,6 +147,7 @@ public class Object {
      * @see     #hashCode()
      * @see     java.util.HashMap
      */
+    // 用于比较2个对象的内存地址是否相等，String类对该方法进行了重写用户比较字符串的值是否相等
     public boolean equals(Object obj) {
         return (this == obj);
     }
@@ -209,6 +212,9 @@ public class Object {
      *               be cloned.
      * @see java.lang.Cloneable
      */
+    // 用于创建并返回当前对象的一份浅拷贝。
+    // 一般情况下，对于任何对象 x，表达式 x.clone() != x 为true，x.clone().getClass() == x.getClass() 为true。
+    // Object本身没有实现Cloneable接口，所以不重写clone方法并且进行调用的话会发生CloneNotSupportedException异常。
     protected native Object clone() throws CloneNotSupportedException;
 
     /**
@@ -232,6 +238,7 @@ public class Object {
      *
      * @return  a string representation of the object.
      */
+    // 返回类的名字@实例的哈希码的16进制的字符串
     public String toString() {
         System.out.println("toString");
         return getClass().getName() + "@" + Integer.toHexString(hashCode());
@@ -269,6 +276,8 @@ public class Object {
      * @see        java.lang.Object#notifyAll()
      * @see        java.lang.Object#wait()
      */
+    // 唤醒一个在此对象监视器上等待的线程(监视器相当于就是锁的概念)
+    // 如果有多个线程在等待只会任意唤醒一个
     public final native void notify();
 
     /**
@@ -293,6 +302,7 @@ public class Object {
      * @see        java.lang.Object#notify()
      * @see        java.lang.Object#wait()
      */
+    // 跟notify一样，唯一的区别就是会唤醒在此对象监视器上等待的所有线程，而不是一个线程
     public final native void notifyAll();
 
     /**
@@ -380,6 +390,8 @@ public class Object {
      * @see        java.lang.Object#notify()
      * @see        java.lang.Object#notifyAll()
      */
+    // 暂停线程的执行
+    // 注意：sleep方法没有释放锁，而wait方法释放了锁
     public final native void wait(long timeout) throws InterruptedException;
 
     /**
@@ -499,6 +511,7 @@ public class Object {
      * @see        java.lang.Object#notify()
      * @see        java.lang.Object#notifyAll()
      */
+    // 该方法一直等待，没有超时时间这个概念
     public final void wait() throws InterruptedException {
         wait(0);
     }
@@ -553,5 +566,6 @@ public class Object {
      * @see java.lang.ref.PhantomReference
      * @jls 12.6 Finalization of Class Instances
      */
+    // 实例被垃圾回收器回收的时候触发的操作(不推荐使用)
     protected void finalize() throws Throwable { }
 }
