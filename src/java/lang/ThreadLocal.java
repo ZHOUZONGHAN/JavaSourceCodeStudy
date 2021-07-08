@@ -195,6 +195,11 @@ public class ThreadLocal<T> {
      *
      * @param value the value to be stored in the current thread's copy of
      *        this thread-local.
+     *
+     * ThreadLocal将value存放在ThreadLocalMap中，一个线程持有一个ThreadLocalMap
+     * ThreadLocalMap中的key为当前ThreadLocal
+     * 注意：
+     * 一个Thread对应一个ThreadLocalMap，一个线程中可以创建多个ThreadLocal对象，ThreadLocal存储在ThreadLocalMap中
      */
     public void set(T value) {
         Thread t = Thread.currentThread();
