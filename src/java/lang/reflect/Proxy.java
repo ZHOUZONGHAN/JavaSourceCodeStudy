@@ -25,6 +25,13 @@
 
 package java.lang.reflect;
 
+import sun.misc.ProxyGenerator;
+import sun.misc.VM;
+import sun.reflect.CallerSensitive;
+import sun.reflect.Reflection;
+import sun.reflect.misc.ReflectUtil;
+import sun.security.util.SecurityConstants;
+
 import java.lang.ref.WeakReference;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -34,12 +41,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
-import sun.misc.ProxyGenerator;
-import sun.misc.VM;
-import sun.reflect.CallerSensitive;
-import sun.reflect.Reflection;
-import sun.reflect.misc.ReflectUtil;
-import sun.security.util.SecurityConstants;
 
 /**
  * {@code Proxy} provides static methods for creating dynamic proxy
@@ -230,14 +231,12 @@ public class Proxy implements java.io.Serializable {
     private static final long serialVersionUID = -2222568056686623797L;
 
     /** parameter types of a proxy class constructor */
-    private static final Class<?>[] constructorParams =
-        { InvocationHandler.class };
+    private static final Class<?>[] constructorParams = { InvocationHandler.class };
 
     /**
      * a cache of proxy classes
      */
-    private static final WeakCache<ClassLoader, Class<?>[], Class<?>>
-        proxyClassCache = new WeakCache<>(new KeyFactory(), new ProxyClassFactory());
+    private static final WeakCache<ClassLoader, Class<?>[], Class<?>> proxyClassCache = new WeakCache<>(new KeyFactory(), new ProxyClassFactory());
 
     /**
      * the invocation handler for this proxy instance.
@@ -358,20 +357,16 @@ public class Proxy implements java.io.Serializable {
      *          argument or any of its elements are {@code null}
      */
     @CallerSensitive
-    public static Class<?> getProxyClass(ClassLoader loader,
-                                         Class<?>... interfaces)
-        throws IllegalArgumentException
-    {
+    public static Class<?> getProxyClass(ClassLoader loader, Class<?>... interfaces) throws IllegalArgumentException {
         final Class<?>[] intfs = interfaces.clone();
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             checkProxyAccess(Reflection.getCallerClass(), loader, intfs);
         }
-
         return getProxyClass0(loader, intfs);
     }
 
-    /*
+    /**
      * Check permissions required to create a Proxy class.
      *
      * To define a proxy class, it performs the access checks as in
@@ -416,10 +411,11 @@ public class Proxy implements java.io.Serializable {
         // If the proxy class defined by the given loader implementing
         // the given interfaces exists, this will simply return the cached copy;
         // otherwise, it will create the proxy class via the ProxyClassFactory
+        // 对代理的字节码做了缓存
         return proxyClassCache.get(loader, interfaces);
     }
 
-    /*
+    /**
      * a key used for proxy class with 0 implemented interfaces
      */
     private static final Object key0 = new Object();
@@ -429,7 +425,7 @@ public class Proxy implements java.io.Serializable {
      * that implement 1 or 2 interfaces.
      */
 
-    /*
+    /**
      * a key used for proxy class with 1 implemented interface
      */
     private static final class Key1 extends WeakReference<Class<?>> {
@@ -456,7 +452,7 @@ public class Proxy implements java.io.Serializable {
         }
     }
 
-    /*
+    /**
      * a key used for proxy class with 2 implemented interfaces
      */
     private static final class Key2 extends WeakReference<Class<?>> {
@@ -487,7 +483,7 @@ public class Proxy implements java.io.Serializable {
         }
     }
 
-    /*
+    /**
      * a key used for proxy class with any number of implemented interfaces
      * (used here for 3 or more only)
      */
@@ -517,8 +513,7 @@ public class Proxy implements java.io.Serializable {
                    equals(refs, ((KeyX) obj).refs);
         }
 
-        private static boolean equals(WeakReference<Class<?>>[] refs1,
-                                      WeakReference<Class<?>>[] refs2) {
+        private static boolean equals(WeakReference<Class<?>>[] refs1, WeakReference<Class<?>>[] refs2) {
             if (refs1.length != refs2.length) {
                 return false;
             }
@@ -553,9 +548,7 @@ public class Proxy implements java.io.Serializable {
     /**
      * A factory function that generates, defines and returns the proxy class given the ClassLoader and array of interfaces.
      */
-    private static final class ProxyClassFactory
-        implements BiFunction<ClassLoader, Class<?>[], Class<?>>
-    {
+    private static final class ProxyClassFactory implements BiFunction<ClassLoader, Class<?>[], Class<?>> {
         // prefix for all proxy class names
         private static final String proxyClassNamePrefix = "$Proxy";
 
@@ -630,16 +623,15 @@ public class Proxy implements java.io.Serializable {
              * Choose a name for the proxy class to generate.
              */
             long num = nextUniqueNumber.getAndIncrement();
+            // 前缀默认是包名称加 $proxy+自增的号码
             String proxyName = proxyPkg + proxyClassNamePrefix + num;
 
             /*
              * Generate the specified proxy class.
              */
-            byte[] proxyClassFile = ProxyGenerator.generateProxyClass(
-                proxyName, interfaces, accessFlags);
+            byte[] proxyClassFile = ProxyGenerator.generateProxyClass(proxyName, interfaces, accessFlags);
             try {
-                return defineClass0(loader, proxyName,
-                                    proxyClassFile, 0, proxyClassFile.length);
+                return defineClass0(loader, proxyName, proxyClassFile, 0, proxyClassFile.length);
             } catch (ClassFormatError e) {
                 /*
                  * A ClassFormatError here means that (barring bugs in the
@@ -699,11 +691,7 @@ public class Proxy implements java.io.Serializable {
      *          {@code null}
      */
     @CallerSensitive
-    public static Object newProxyInstance(ClassLoader loader,
-                                          Class<?>[] interfaces,
-                                          InvocationHandler h)
-        throws IllegalArgumentException
-    {
+    public static Object newProxyInstance(ClassLoader loader, Class<?>[] interfaces, InvocationHandler h) throws IllegalArgumentException {
         // 判断InvocationHandler是否为空
         Objects.requireNonNull(h);
 
@@ -716,6 +704,7 @@ public class Proxy implements java.io.Serializable {
         /*
          * Look up or generate the designated proxy class.
          */
+        // 得到代理的对象的class对象
         Class<?> cl = getProxyClass0(loader, intfs);
 
         /*
@@ -729,11 +718,9 @@ public class Proxy implements java.io.Serializable {
             final Constructor<?> cons = cl.getConstructor(constructorParams);
             final InvocationHandler ih = h;
             if (!Modifier.isPublic(cl.getModifiers())) {
-                AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                    public Void run() {
-                        cons.setAccessible(true);
-                        return null;
-                    }
+                AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+                    cons.setAccessible(true);
+                    return null;
                 });
             }
             return cons.newInstance(new Object[]{h});
