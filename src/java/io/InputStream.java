@@ -270,6 +270,7 @@ public abstract class InputStream implements Closeable {
      *
      * @exception  IOException  if an I/O error occurs.
      */
+    @Override
     public void close() throws IOException {}
 
     /**

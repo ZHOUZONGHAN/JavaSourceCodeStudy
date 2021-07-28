@@ -41,11 +41,13 @@ package java.io;
  *
  * @author  Jonathan Payne
  * @since   JDK1.0
+ *
+ * 装饰器父类，对所有方法都有默认实现，子装饰器类只需要增强自己关注的方法即可，其他方法继承装饰器父类的默认实现
  */
-public
-class FilterInputStream extends InputStream {
+public class FilterInputStream extends InputStream {
     /**
      * The input stream to be filtered.
+     * 用于接受其他实现了InputStream装饰器子类
      */
     protected volatile InputStream in;
 
@@ -79,6 +81,7 @@ class FilterInputStream extends InputStream {
      * @exception  IOException  if an I/O error occurs.
      * @see        java.io.FilterInputStream#in
      */
+    @Override
     public int read() throws IOException {
         return in.read();
     }
@@ -103,6 +106,7 @@ class FilterInputStream extends InputStream {
      * @exception  IOException  if an I/O error occurs.
      * @see        java.io.FilterInputStream#read(byte[], int, int)
      */
+    @Override
     public int read(byte b[]) throws IOException {
         return read(b, 0, b.length);
     }
@@ -129,6 +133,7 @@ class FilterInputStream extends InputStream {
      * @exception  IOException  if an I/O error occurs.
      * @see        java.io.FilterInputStream#in
      */
+    @Override
     public int read(byte b[], int off, int len) throws IOException {
         return in.read(b, off, len);
     }
@@ -147,6 +152,7 @@ class FilterInputStream extends InputStream {
      * @exception  IOException  if the stream does not support seek,
      *                          or if some other I/O error occurs.
      */
+    @Override
     public long skip(long n) throws IOException {
         return in.skip(n);
     }
@@ -164,6 +170,7 @@ class FilterInputStream extends InputStream {
      *             over) from this input stream without blocking.
      * @exception  IOException  if an I/O error occurs.
      */
+    @Override
     public int available() throws IOException {
         return in.available();
     }
@@ -177,6 +184,7 @@ class FilterInputStream extends InputStream {
      * @exception  IOException  if an I/O error occurs.
      * @see        java.io.FilterInputStream#in
      */
+    @Override
     public void close() throws IOException {
         in.close();
     }
@@ -197,6 +205,7 @@ class FilterInputStream extends InputStream {
      * @see     java.io.FilterInputStream#in
      * @see     java.io.FilterInputStream#reset()
      */
+    @Override
     public synchronized void mark(int readlimit) {
         in.mark(readlimit);
     }
@@ -222,6 +231,7 @@ class FilterInputStream extends InputStream {
      * @see        java.io.FilterInputStream#in
      * @see        java.io.FilterInputStream#mark(int)
      */
+    @Override
     public synchronized void reset() throws IOException {
         in.reset();
     }
@@ -239,6 +249,7 @@ class FilterInputStream extends InputStream {
      * @see     java.io.InputStream#mark(int)
      * @see     java.io.InputStream#reset()
      */
+    @Override
     public boolean markSupported() {
         return in.markSupported();
     }

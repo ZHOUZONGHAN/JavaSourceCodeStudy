@@ -46,11 +46,11 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  *
  * @author  Arthur van Hoff
  * @since   JDK1.0
+ * 只需要关注自己需要增强的实现，其他方法通过父类FilterInputStream使用
  */
-public
-class BufferedInputStream extends FilterInputStream {
+public class BufferedInputStream extends FilterInputStream {
 
-    private static int DEFAULT_BUFFER_SIZE = 8192;
+    private static final int DEFAULT_BUFFER_SIZE = 8192;
 
     /**
      * The maximum size of array to allocate.
@@ -58,14 +58,14 @@ class BufferedInputStream extends FilterInputStream {
      * Attempts to allocate larger arrays may result in
      * OutOfMemoryError: Requested array size exceeds VM limit
      */
-    private static int MAX_BUFFER_SIZE = Integer.MAX_VALUE - 8;
+    private static final int MAX_BUFFER_SIZE = Integer.MAX_VALUE - 8;
 
     /**
      * The internal buffer array where the data is stored. When necessary,
      * it may be replaced by another array of
      * a different size.
      */
-    protected volatile byte buf[];
+    protected volatile byte[] buf;
 
     /**
      * Atomic updater to provide compareAndSet for buf. This is
@@ -155,8 +155,9 @@ class BufferedInputStream extends FilterInputStream {
      */
     private InputStream getInIfOpen() throws IOException {
         InputStream input = in;
-        if (input == null)
+        if (input == null) {
             throw new IOException("Stream closed");
+        }
         return input;
     }
 
@@ -166,8 +167,9 @@ class BufferedInputStream extends FilterInputStream {
      */
     private byte[] getBufIfOpen() throws IOException {
         byte[] buffer = buf;
-        if (buffer == null)
+        if (buffer == null) {
             throw new IOException("Stream closed");
+        }
         return buffer;
     }
 
@@ -212,25 +214,32 @@ class BufferedInputStream extends FilterInputStream {
      */
     private void fill() throws IOException {
         byte[] buffer = getBufIfOpen();
-        if (markpos < 0)
-            pos = 0;            /* no mark: throw away the buffer */
-        else if (pos >= buffer.length)  /* no room left in buffer */
-            if (markpos > 0) {  /* can throw away early part of the buffer */
+        if (markpos < 0) {
+            /* no mark: throw away the buffer */
+            pos = 0;
+        } else if (pos >= buffer.length) {
+            /* no room left in buffer */
+            if (markpos > 0) {
+                /* can throw away early part of the buffer */
                 int sz = pos - markpos;
                 System.arraycopy(buffer, markpos, buffer, 0, sz);
                 pos = sz;
                 markpos = 0;
             } else if (buffer.length >= marklimit) {
-                markpos = -1;   /* buffer got too big, invalidate mark */
-                pos = 0;        /* drop buffer contents */
+                /* buffer got too big, invalidate mark */
+                markpos = -1;
+                pos = 0;
             } else if (buffer.length >= MAX_BUFFER_SIZE) {
+                /* drop buffer contents */
                 throw new OutOfMemoryError("Required array size too large");
-            } else {            /* grow buffer */
+            } else {
+                /* grow buffer */
                 int nsz = (pos <= MAX_BUFFER_SIZE - pos) ?
                         pos * 2 : MAX_BUFFER_SIZE;
-                if (nsz > marklimit)
+                if (nsz > marklimit) {
                     nsz = marklimit;
-                byte nbuf[] = new byte[nsz];
+                }
+                byte[] nbuf = new byte[nsz];
                 System.arraycopy(buffer, 0, nbuf, 0, pos);
                 if (!bufUpdater.compareAndSet(this, buffer, nbuf)) {
                     // Can't replace buf if there was an async close.
@@ -242,10 +251,12 @@ class BufferedInputStream extends FilterInputStream {
                 }
                 buffer = nbuf;
             }
+        }
         count = pos;
         int n = getInIfOpen().read(buffer, pos, buffer.length - pos);
-        if (n > 0)
+        if (n > 0) {
             count = n + pos;
+        }
     }
 
     /**
@@ -260,11 +271,13 @@ class BufferedInputStream extends FilterInputStream {
      *                          or an I/O error occurs.
      * @see        java.io.FilterInputStream#in
      */
+    @Override
     public synchronized int read() throws IOException {
         if (pos >= count) {
             fill();
-            if (pos >= count)
+            if (pos >= count) {
                 return -1;
+            }
         }
         return getBufIfOpen()[pos++] & 0xff;
     }
@@ -285,7 +298,9 @@ class BufferedInputStream extends FilterInputStream {
             }
             fill();
             avail = count - pos;
-            if (avail <= 0) return -1;
+            if (avail <= 0) {
+                return -1;
+            }
         }
         int cnt = (avail < len) ? avail : len;
         System.arraycopy(getBufIfOpen(), pos, b, off, cnt);
@@ -330,7 +345,8 @@ class BufferedInputStream extends FilterInputStream {
      *                          invoking its {@link #close()} method,
      *                          or an I/O error occurs.
      */
-    public synchronized int read(byte b[], int off, int len)
+    @Override
+    public synchronized int read(byte[] b, int off, int len)
         throws IOException
     {
         getBufIfOpen(); // Check for closed stream
@@ -343,15 +359,18 @@ class BufferedInputStream extends FilterInputStream {
         int n = 0;
         for (;;) {
             int nread = read1(b, off + n, len - n);
-            if (nread <= 0)
+            if (nread <= 0) {
                 return (n == 0) ? nread : n;
+            }
             n += nread;
-            if (n >= len)
+            if (n >= len) {
                 return n;
+            }
             // if not closed but no bytes available, return
             InputStream input = in;
-            if (input != null && input.available() <= 0)
+            if (input != null && input.available() <= 0) {
                 return n;
+            }
         }
     }
 
@@ -364,6 +383,7 @@ class BufferedInputStream extends FilterInputStream {
      *                          invoking its {@link #close()} method, or an
      *                          I/O error occurs.
      */
+    @Override
     public synchronized long skip(long n) throws IOException {
         getBufIfOpen(); // Check for closed stream
         if (n <= 0) {
@@ -373,14 +393,16 @@ class BufferedInputStream extends FilterInputStream {
 
         if (avail <= 0) {
             // If no mark position set then don't keep in buffer
-            if (markpos <0)
+            if (markpos <0) {
                 return getInIfOpen().skip(n);
+            }
 
             // Fill in buffer to save bytes for reset
             fill();
             avail = count - pos;
-            if (avail <= 0)
+            if (avail <= 0) {
                 return 0;
+            }
         }
 
         long skipped = (avail < n) ? avail : n;
@@ -405,6 +427,7 @@ class BufferedInputStream extends FilterInputStream {
      *                          invoking its {@link #close()} method,
      *                          or an I/O error occurs.
      */
+    @Override
     public synchronized int available() throws IOException {
         int n = count - pos;
         int avail = getInIfOpen().available();
@@ -421,6 +444,7 @@ class BufferedInputStream extends FilterInputStream {
      *                      the mark position becomes invalid.
      * @see     java.io.BufferedInputStream#reset()
      */
+    @Override
     public synchronized void mark(int readlimit) {
         marklimit = readlimit;
         markpos = pos;
@@ -442,10 +466,12 @@ class BufferedInputStream extends FilterInputStream {
      *                  method, or an I/O error occurs.
      * @see        java.io.BufferedInputStream#mark(int)
      */
+    @Override
     public synchronized void reset() throws IOException {
         getBufIfOpen(); // Cause exception if closed
-        if (markpos < 0)
+        if (markpos < 0) {
             throw new IOException("Resetting to invalid mark");
+        }
         pos = markpos;
     }
 
@@ -460,6 +486,7 @@ class BufferedInputStream extends FilterInputStream {
      * @see     java.io.InputStream#mark(int)
      * @see     java.io.InputStream#reset()
      */
+    @Override
     public boolean markSupported() {
         return true;
     }
@@ -473,14 +500,16 @@ class BufferedInputStream extends FilterInputStream {
      *
      * @exception  IOException  if an I/O error occurs.
      */
+    @Override
     public void close() throws IOException {
         byte[] buffer;
         while ( (buffer = buf) != null) {
             if (bufUpdater.compareAndSet(this, buffer, null)) {
                 InputStream input = in;
                 in = null;
-                if (input != null)
+                if (input != null) {
                     input.close();
+                }
                 return;
             }
             // Else retry in case a new buf was CASed in fill()
