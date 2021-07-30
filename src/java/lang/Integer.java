@@ -128,15 +128,16 @@ public final class Integer extends Number implements Comparable<Integer> {
      * @see     java.lang.Character#MIN_RADIX
      */
     public static String toString(int i, int radix) {
-        if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX)
+        if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX) {
             radix = 10;
+        }
 
         /* Use the faster version */
         if (radix == 10) {
             return toString(i);
         }
 
-        char buf[] = new char[33];
+        char[] buf = new char[33];
         boolean negative = (i < 0);
         int charPos = 32;
 
@@ -395,8 +396,9 @@ public final class Integer extends Number implements Comparable<Integer> {
      * @return  a string representation of the argument in base&nbsp;10.
      */
     public static String toString(int i) {
-        if (i == Integer.MIN_VALUE)
+        if (i == Integer.MIN_VALUE) {
             return "-2147483648";
+        }
         int size = (i < 0) ? stringSize(-i) + 1 : stringSize(i);
         char[] buf = new char[size];
         getChars(i, size, buf);
@@ -457,7 +459,9 @@ public final class Integer extends Number implements Comparable<Integer> {
             r = i - ((q << 3) + (q << 1));  // r = i-(q*10) ...
             buf [--charPos] = digits [r];
             i = q;
-            if (i == 0) break;
+            if (i == 0) {
+                break;
+            }
         }
         if (sign != 0) {
             buf [--charPos] = sign;
@@ -469,9 +473,11 @@ public final class Integer extends Number implements Comparable<Integer> {
 
     // Requires positive x
     static int stringSize(int x) {
-        for (int i=0; ; i++)
-            if (x <= sizeTable[i])
+        for (int i=0; ; i++) {
+            if (x <= sizeTable[i]) {
                 return i+1;
+            }
+        }
     }
 
     /**
@@ -565,11 +571,14 @@ public final class Integer extends Number implements Comparable<Integer> {
                 if (firstChar == '-') {
                     negative = true;
                     limit = Integer.MIN_VALUE;
-                } else if (firstChar != '+')
+                } else if (firstChar != '+') {
                     throw NumberFormatException.forInputString(s);
+                }
 
                 if (len == 1) // Cannot have lone "+" or "-"
+                {
                     throw NumberFormatException.forInputString(s);
+                }
                 i++;
             }
             multmin = limit / radix;
@@ -780,11 +789,13 @@ public final class Integer extends Number implements Comparable<Integer> {
     private static class IntegerCache {
         static final int low = -128;
         static final int high;
-        static final Integer cache[];
+        static final Integer[] cache;
 
         static {
             // high value may be configured by property
             int h = 127;
+            // 可以通过修改虚拟机启动参数设置最大值
+            // 方法一：-Djava.lang.Integer.IntegerCache.high=255 方法二：-XX:AutoBoxCacheMax=255
             String integerCacheHighPropValue =
                 sun.misc.VM.getSavedProperty("java.lang.Integer.IntegerCache.high");
             if (integerCacheHighPropValue != null) {
@@ -798,11 +809,12 @@ public final class Integer extends Number implements Comparable<Integer> {
                 }
             }
             high = h;
-
+            // 缓存 -128 到 127 之间的整型值
             cache = new Integer[(high - low) + 1];
             int j = low;
-            for(int k = 0; k < cache.length; k++)
+            for(int k = 0; k < cache.length; k++) {
                 cache[k] = new Integer(j++);
+            }
 
             // range [-128, 127] must be interned (JLS7 5.1.7)
             assert IntegerCache.high >= 127;
@@ -827,8 +839,9 @@ public final class Integer extends Number implements Comparable<Integer> {
      * @since  1.5
      */
     public static Integer valueOf(int i) {
-        if (i >= IntegerCache.low && i <= IntegerCache.high)
+        if (i >= IntegerCache.low && i <= IntegerCache.high) {
             return IntegerCache.cache[i + (-IntegerCache.low)];
+        }
         return new Integer(i);
     }
 
@@ -872,6 +885,7 @@ public final class Integer extends Number implements Comparable<Integer> {
      * after a narrowing primitive conversion.
      * @jls 5.1.3 Narrowing Primitive Conversions
      */
+    @Override
     public byte byteValue() {
         return (byte)value;
     }
@@ -881,6 +895,7 @@ public final class Integer extends Number implements Comparable<Integer> {
      * after a narrowing primitive conversion.
      * @jls 5.1.3 Narrowing Primitive Conversions
      */
+    @Override
     public short shortValue() {
         return (short)value;
     }
@@ -889,6 +904,7 @@ public final class Integer extends Number implements Comparable<Integer> {
      * Returns the value of this {@code Integer} as an
      * {@code int}.
      */
+    @Override
     public int intValue() {
         return value;
     }
@@ -899,6 +915,7 @@ public final class Integer extends Number implements Comparable<Integer> {
      * @jls 5.1.2 Widening Primitive Conversions
      * @see Integer#toUnsignedLong(int)
      */
+    @Override
     public long longValue() {
         return (long)value;
     }
@@ -908,6 +925,7 @@ public final class Integer extends Number implements Comparable<Integer> {
      * after a widening primitive conversion.
      * @jls 5.1.2 Widening Primitive Conversions
      */
+    @Override
     public float floatValue() {
         return (float)value;
     }
@@ -917,6 +935,7 @@ public final class Integer extends Number implements Comparable<Integer> {
      * after a widening primitive conversion.
      * @jls 5.1.2 Widening Primitive Conversions
      */
+    @Override
     public double doubleValue() {
         return (double)value;
     }
@@ -931,6 +950,7 @@ public final class Integer extends Number implements Comparable<Integer> {
      * @return  a string representation of the value of this object in
      *          base&nbsp;10.
      */
+    @Override
     public String toString() {
         return toString(value);
     }
@@ -970,6 +990,7 @@ public final class Integer extends Number implements Comparable<Integer> {
      * @return  {@code true} if the objects are the same;
      *          {@code false} otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof Integer) {
             return value == ((Integer)obj).intValue();
@@ -1158,15 +1179,17 @@ public final class Integer extends Number implements Comparable<Integer> {
         boolean negative = false;
         Integer result;
 
-        if (nm.length() == 0)
+        if (nm.length() == 0) {
             throw new NumberFormatException("Zero length string");
+        }
         char firstChar = nm.charAt(0);
         // Handle sign, if present
         if (firstChar == '-') {
             negative = true;
             index++;
-        } else if (firstChar == '+')
+        } else if (firstChar == '+') {
             index++;
+        }
 
         // Handle radix specifier, if present
         if (nm.startsWith("0x", index) || nm.startsWith("0X", index)) {
@@ -1182,8 +1205,9 @@ public final class Integer extends Number implements Comparable<Integer> {
             radix = 8;
         }
 
-        if (nm.startsWith("-", index) || nm.startsWith("+", index))
+        if (nm.startsWith("-", index) || nm.startsWith("+", index)) {
             throw new NumberFormatException("Sign character in wrong position");
+        }
 
         try {
             result = Integer.valueOf(nm.substring(index), radix);
@@ -1212,6 +1236,7 @@ public final class Integer extends Number implements Comparable<Integer> {
      *           comparison).
      * @since   1.2
      */
+    @Override
     public int compareTo(Integer anotherInteger) {
         return compare(this.value, anotherInteger.value);
     }
@@ -1394,8 +1419,9 @@ public final class Integer extends Number implements Comparable<Integer> {
      */
     public static int numberOfLeadingZeros(int i) {
         // HD, Figure 5-6
-        if (i == 0)
+        if (i == 0) {
             return 32;
+        }
         int n = 1;
         if (i >>> 16 == 0) { n += 16; i <<= 16; }
         if (i >>> 24 == 0) { n +=  8; i <<=  8; }
@@ -1422,7 +1448,9 @@ public final class Integer extends Number implements Comparable<Integer> {
     public static int numberOfTrailingZeros(int i) {
         // HD, Figure 5-14
         int y;
-        if (i == 0) return 32;
+        if (i == 0) {
+            return 32;
+        }
         int n = 31;
         y = i <<16; if (y != 0) { n = n -16; i = y; }
         y = i << 8; if (y != 0) { n = n - 8; i = y; }
